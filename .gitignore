@@ -1,0 +1,6 @@
+__pycache__
+.env
+venv/
+venv_310
+app/00_used_main_files/
+old_requirements.txt
