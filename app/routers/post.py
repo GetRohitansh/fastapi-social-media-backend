@@ -34,7 +34,7 @@ def create_post(post: schemas.PostCreate, db: Session = Depends(get_db), current
     # dependencies are session and authentication
     # dependency: only authenticated / logged in user can create posts
     print(current_user)    
-    new_post = models.Post(owner_id=current_user.id, **post.dict()) # owner_id + unpack post as dictionary
+    new_post = models.Post(owner_id=current_user.id, **post.model_dump()) # owner_id + unpack post as dictionary
     db.add(new_post)
     db.commit()
     db.refresh(new_post) # retrieve new post that we commited and store inside new_post
@@ -96,6 +96,6 @@ def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Not authorized to perform requested action")
     
-    post.update(updated_post.dict(), synchronize_session=False)
+    post.update(updated_post.model_dump(), synchronize_session=False)
     db.commit() 
     return post.first()
