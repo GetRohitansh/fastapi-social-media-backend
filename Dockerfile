@@ -18,4 +18,4 @@ COPY . .
 # hence if we change source code is comes directly to last COPY . . layer
 # docker knows which file is changed this way
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
