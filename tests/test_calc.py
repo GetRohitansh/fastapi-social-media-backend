@@ -41,6 +41,12 @@ def test_bank_account_interest(bank_account):
     bank_account.collect_interest()
     assert round(bank_account.balance) == 55
 
+@pytest.mark.parametrize("deposit, withdraw, expected", [(500, 200, 350,), (500, 300, 250)])
+def test_transactions(bank_account, deposit, withdraw, expected):
+    bank_account.deposit(deposit)
+    bank_account.withdraw(withdraw)
+    assert bank_account.balance == expected
+
 def test_insufficient_fund(bank_account):
      # This accepts only InsufficientFund Exception,
      # if some other exception is detected test won't pass
