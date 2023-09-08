@@ -1,0 +1,24 @@
+name: Build and Deploy Code
+
+# when does CI/CD trigger (on)
+# it triggers (on) when git push/pull_request is main on specified branches
+on: 
+  push:
+    branches: 
+      - "main"  
+  pull_request:
+    branches: 
+      - "main"
+
+# A job is a set of steps in a workflow that is executed on the same runner.
+# Each step is either a shell script that will be executed, or an action that will be run.
+# Steps are executed in order and are dependent on each other.
+# Since each step is executed on the same runner, you can share data from one step to another.
+
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: pulling git repo
+        uses: actions/checkout@v4
+      - name: 

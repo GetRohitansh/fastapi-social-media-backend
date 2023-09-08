@@ -1,10 +1,11 @@
-import pytest
 from fastapi.testclient import TestClient
 from app.main import app
 from app.config import Settings
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from app.database import get_db, Base
+from app.oauth2 import create_access_token
+from app import models
 import pytest
 
 
@@ -55,3 +56,66 @@ def test_user(client):
     new_user = res.json()
     new_user['password'] = user_data['password']
     return new_user
+
+@pytest.fixture
+def test_user_2(client):
+    user_data = {"email": "user123@gmail.com", "password": "123 password"}
+    res = client.post("/user/", json= user_data)
+    assert res.status_code == 201
+
+    # add password in new_user dictionary
+    new_user = res.json()
+    new_user['password'] = user_data['password']
+    return new_user
+
+
+############################ create token for authentication ############################
+
+@pytest.fixture
+def token(test_user):
+    return create_access_token({'user_id': test_user['id']})
+
+@pytest.fixture
+def authorized_client(client, token):
+    client.headers = {
+        **client.headers,
+        "Authorization": f"Bearer {token}"
+    }
+
+    return client
+
+############################ posts ############################
+
+@pytest.fixture
+def test_posts(test_user, session, test_user_2):
+    posts_data = [{
+        "title": "title 1",
+        "content": "content 1",
+        "owner_id": test_user['id']
+    },{
+        "title": "title 2",
+        "content": "content 2",
+        "owner_id": test_user['id']
+    },{
+        "title": "title 3",
+        "content": "content 3",
+        "owner_id": test_user['id']
+    },{
+        "title": "title 4",
+        "content": "content 4",
+        "owner_id": test_user_2['id']
+    }]
+
+    # Adding posts directly to database
+    # so that we can test get post function
+    def create_post_model(post):
+        return models.Post(**post)
+    
+    post_map = map(create_post_model, posts_data)
+    post_list = list(post_map)
+    
+    session.add_all(post_list)
+    session.commit()
+
+    posts = session.query(models.Post).all()
+    return posts
