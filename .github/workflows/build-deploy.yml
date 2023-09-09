@@ -97,7 +97,8 @@ jobs:
       # login to ubuntu server
       # cd /app/src
       # git pull 
-      # systemctl restart api
+      # echo password | sudo -S systemctl restart api // passing the password into for authentication
+
       - name: deploy to ubuntu server
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -107,4 +108,4 @@ jobs:
           script: |
             cd app/src
             git pull 
-            sudo systemctl restart api
+            echo password | sudo -S systemctl restart api
