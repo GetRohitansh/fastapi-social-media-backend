@@ -107,5 +107,5 @@ jobs:
           password: ${{secrets.PRODUCTION_PASSWORD}}
           script: |
             cd app/src
-            git pull 
+            git pull origin main
             echo password | sudo -S systemctl restart api
