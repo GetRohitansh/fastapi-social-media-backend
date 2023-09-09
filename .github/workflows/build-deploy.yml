@@ -15,7 +15,7 @@ on:
 # Steps are executed in order and are dependent on each other.
 # Since each step is executed on the same runner, you can share data from one step to another.
 jobs:
-  job1:
+  build:
     environment: # fetch variable from github environment
       name: testing
     env:
@@ -66,22 +66,45 @@ jobs:
           pip install pytest
           pytest
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{secrets.DOCKERHUB_USERNAME}}
-          password: ${{secrets.DOCKERHUB_ACCESS_TOKEN}}
+      # - name: Login to Docker Hub
+      #   uses: docker/login-action@v2
+      #   with:
+      #     username: ${{secrets.DOCKERHUB_USERNAME}}
+      #     password: ${{secrets.DOCKERHUB_ACCESS_TOKEN}}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+      # - name: Set up Docker Buildx
+      #   uses: docker/setup-buildx-action@v2
 
-      - name: Build and push
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ${{secrets.DOCKERHUB_USERNAME}}/fastapi:latest
+      # - name: Build and push
+      #   uses: docker/build-push-action@v4
+      #   with:
+      #     context: .
+      #     file: ./Dockerfile
+      #     push: true
+      #     tags: ${{secrets.DOCKERHUB_USERNAME}}/fastapi:latest
         
-      - name: Image Digest
-        run: echo ${{steps.docker_build.outputs.digest}}
+      # - name: Image Digest
+      #   run: echo ${{steps.docker_build.outputs.digest}}
+  
+  ############# CI part ends here #############################
+  ############# CD part starts here ###########################
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build] #Which job does it come after
+    environment:
+      name: production
+    steps:
+      # login to ubuntu server
+      # cd /app/src
+      # git pull 
+      # systemctl restart api
+      - name: deploy to ubuntu server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{secrets.PRODUCTION_HOST}}
+          username: ${{secrets.PRODUCTION_USERNAME}}
+          password: ${{secrets.PRODUCTION_PASSWORD}}
+          script: |
+            cd app/src
+            git pull 
+            sudo systemctl restart api
